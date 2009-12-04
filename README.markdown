@@ -29,13 +29,25 @@ When using a zoomed paper the standard "attr" method should be replaced with "se
 The raphael.zoom plugin will than take care of zoomed stroke widths and text elements.
 
     // Example of setting attributes with the zoom plugin:
-    circle.setAttr("fill", "#f30");
+    circle.setAttr("stroke-width", 2);
     
     // or
-    circle.setAttr({ fill: "#f30" });
+    circle.setAttr({ "stroke-width": 2 });
 
 Important:
 Using element.attr instead of element.setAttr with a zoomed paper, the shape will be transformed in the current zoom value and not the real value!
+
+Also element.translate shoud be replaced with element.setTranslation.
+Like
+
+    // Translate element
+    circle.setTranslation(20, 30);
+
+As an extra this plugin will provide you with a paper.elements() function.
+This will return an array with all elements in the paper:
+
+    // Get all elements
+    var shapes = paper.elements();
 
 ### Dependencies
 - [Raphael JS](http://raphaeljs.com/)
