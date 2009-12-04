@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Raphael Zoom - Interactive demo</title>
+    <style type="text/css" media="screen">
+      body, html {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        height: 100%;
+      }
+      #paper {
+        width:100%;
+        height: 100%;
+      }
+      #buttons {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <div id="paper"></div>
+    <div id="buttons">
+      <input type="button" name="zoom_20" value="Zoom to 20%" class="button" onclick="Demo.setZoom(0.2)" />
+      <input type="button" name="zoom_50" value="Zoom to 50%" class="button" onclick="Demo.setZoom(0.5)" />
+      <input type="button" name="zoom_100" value="Zoom to 100%" class="button" onclick="Demo.setZoom(1)" />
+      <input type="button" name="zoom_200" value="Zoom to 200%" class="button" onclick="Demo.setZoom(2)" />
+    </div>
+  </body>
+  <script src="lib/prototype.js" type="text/javascript" charset="utf-8"></script>
+  <script src="lib/onresize.js" type="text/javascript" charset="utf-8"></script>
+  <script src="lib/raphael-min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="raphael.zoom.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/demo.js" type="text/javascript" charset="utf-8"></script>
+</html>
