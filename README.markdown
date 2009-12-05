@@ -1,4 +1,4 @@
-# Raphaël Zoom plugin - 0.0.1
+# Raphaël Zoom plugin - 0.0.2
 
 ### What is it?
 An extension to the Raphael Vector Library.<br/>

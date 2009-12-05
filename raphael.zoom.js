@@ -1,31 +1,9 @@
-// initialize zoom of paper
-Raphael.fn.initZoom = function(zoom) {
-  this.zoom = zoom || 1;
-  this.elements().each((function(element) {
-    element.initZoom(this.zoom);
-  }).bind(this));
-}
-
-// set the zoom of all elements
-Raphael.fn.setZoom = function(zoom) {
-  if (!this.zoom) this.initZoom();
-  this.elements().each((function(element) {
-     if (!element.zoom) element.initZoom(this.zoom);
-     element.setZoom(zoom);
-   }).bind(this));
-  this.zoom = zoom;
-}
-
-// get all elements in the paper
-Raphael.fn.elements = function() {
-  var b = this.bottom,
-      r = []; 
-  while (b) { 
-    r.push(b); 
-    b = b.next; 
-  }
-  return r;
-}
+/*
+ * raphael.zoom 0.0.2
+ *
+ * Copyright (c) 2009 Wout Fierens
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
 
 // initialize zoom of element
 Raphael.el.initZoom = function(zoom) {
@@ -104,7 +82,8 @@ Raphael.el.setTranslation = function(x, y) {
 
 // set element zoomed stroke width
 Raphael.el.setStrokeWidth = function(sw) {
-  if (sw = parseFloat(sw)) {
+  if (sw.isFloat()) {
+    sw = parseFloat(sw);
     this.attr({ "stroke-width": sw * this.zoom.value });
     this.zoom["stroke-width"] = sw;
   }
@@ -113,7 +92,8 @@ Raphael.el.setStrokeWidth = function(sw) {
 
 // set element font size
 Raphael.el.setFontSize = function(fs) {
-  if (fs = parseFloat(fs)) {
+  if (fs.isFloat()) {
+    fs = parseFloat(fs);
     this.attr({ "font-size": fs });
     this.zoom["font-size"] = fs / this.zoom.value;
   }
@@ -127,6 +107,29 @@ Raphael.el.applyScale = function() {
   this.scale(1, 1);
 }
 
+// Number class methods
+Object.extend(Number.prototype, {
+  isInt: function() {
+    if (this == 0) return true;
+    return parseInt(this) ? true : false;
+  },
+  isFloat: function() {
+    if (this == 0.0) return true;
+    return parseFloat(this) ? true : false;
+  }
+});
+
+// String class methods
+Object.extend(String.prototype, {
+  isInt: function() {
+    if (this == "0") return true;
+    return parseInt(this) ? true : false;
+  },
+  isFloat: function() {
+    if (["0", "0.0"].indexOf(this) > -1) return true;
+    return parseFloat(this) ? true : false;
+  }
+});
 
 
 
