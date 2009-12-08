@@ -4,6 +4,35 @@
  * Copyright (c) 2009 Wout Fierens
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
+ 
+// initialize zoom of paper
+Raphael.fn.initZoom = function(zoom) {
+  this.zoom = zoom || 1;
+  this.elements().each((function(element) {
+    element.initZoom(this.zoom);
+  }).bind(this));
+}
+
+// set the zoom of all elements
+Raphael.fn.setZoom = function(zoom) {
+  if (!this.zoom) this.initZoom();
+  this.elements().each((function(element) {
+     if (!element.zoom) element.initZoom(this.zoom);
+     element.setZoom(zoom);
+   }).bind(this));
+  this.zoom = zoom;
+}
+
+// get all elements in the paper
+Raphael.fn.elements = function() {
+  var b = this.bottom,
+      r = []; 
+  while (b) { 
+    r.push(b); 
+    b = b.next; 
+  }
+  return r;
+}
 
 // initialize zoom of element
 Raphael.el.initZoom = function(zoom) {
