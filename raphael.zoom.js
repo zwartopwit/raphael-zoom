@@ -1,5 +1,5 @@
 /*
- * raphael.zoom 0.0.2
+ * raphael.zoom 0.0.3
  *
  * Copyright (c) 2009 Wout Fierens
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
