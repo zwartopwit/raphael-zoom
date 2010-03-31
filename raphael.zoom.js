@@ -1,27 +1,9 @@
 /*
- * raphael.zoom 0.0.3
+ * raphael.zoom 0.0.4
  *
- * Copyright (c) 2009 Wout Fierens
+ * Copyright (c) 2010 Wout Fierens - http://boysabroad.com
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
- 
-// initialize zoom of paper
-Raphael.fn.initZoom = function(zoom) {
-  this.zoom = zoom || 1;
-  this.elements().each((function(element) {
-    element.initZoom(this.zoom);
-  }).bind(this));
-}
-
-// set the zoom of all elements
-Raphael.fn.setZoom = function(zoom) {
-  if (!this.zoom) this.initZoom();
-  this.elements().each((function(element) {
-     if (!element.zoom) element.initZoom(this.zoom);
-     element.setZoom(zoom);
-   }).bind(this));
-  this.zoom = zoom;
-}
 
 // get all elements in the paper
 Raphael.fn.elements = function() {
@@ -34,39 +16,79 @@ Raphael.fn.elements = function() {
   return r;
 }
 
+// initialize zoom of paper
+Raphael.fn.initZoom = function(zoom) {
+  var elements = this.elements();
+  this.zoom = zoom || 1;
+  
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].initZoom();
+  }
+  
+  return this;
+}
+
+// set the zoom of all elements
+Raphael.fn.setZoom = function(zoom) {
+  if (!zoom) return;
+  
+  var elements = this.elements();
+  if (!this.zoom)
+    this.initZoom();
+  
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].setZoom(zoom);
+  }
+  this.zoom = zoom;
+  
+  return this;
+}
+
 // initialize zoom of element
 Raphael.el.initZoom = function(zoom) {
-  var sw = parseFloat(this.attrs["stroke-width"]) || 0;
-  this.zoom = {
-    value: zoom,
-    "stroke-width": sw
+  var sw = parseFloat(this.attr("stroke-width")) || 0;
+  zoom = zoom || this.paper.zoom;
+  
+  if (this.type != "text") sw /= zoom;
+  this.zoom = zoom;
+  this.zoom_memory = {
+    "stroke-width": sw,
+    rotation:       360
   };
-  this.setStrokeWidth(sw);
+  
+  this.setStrokeWidth(sw / zoom);
+  
   if (this.type == "text") {
-    var fs = parseFloat(this.attrs["font-size"]) || 0
-    this.zoom["font-size"] = fs;
-    this.zoom["x"] = (parseFloat(this.attrs["x"]) || 0) / zoom;
-    this.zoom["y"] = (parseFloat(this.attrs["y"]) || 0) / zoom;
-    this.setFontSize(fs);
+    var fs = parseFloat(this.attr("font-size")) || 0
+    this.zoom_memory["font-size"] = fs;
+    this.zoom_memory["x"] = (parseFloat(this.attrs["x"]) || 0) / zoom;
+    this.zoom_memory["y"] = (parseFloat(this.attrs["y"]) || 0) / zoom;
   }
+  return this;
 }
 
 // zoom element preserving some original values
 Raphael.el.setZoom = function(zoom) {
   if (!zoom) return;
-  if (!this.zoom) this.initZoom(zoom);
+  if (!this.zoom_memory)
+    this.initZoom();
+  
   // scale to zoom
-  var new_zoom = zoom / this.zoom.value;
+  var new_zoom = zoom / this.zoom;
   this.scale(new_zoom, new_zoom, 0, 0);
   this.applyScale();
+  
   // save new zoom
-  this.zoom.value = zoom;
-  this.setStrokeWidth(this.zoom["stroke-width"]);
-  if (this.type == "text") {
-    this.setFontSize(this.zoom["font-size"] * zoom);
-    this.attr("x", this.zoom["x"] * zoom);
-    this.attr("y", this.zoom["y"] * zoom);
-  }
+  this.zoom = zoom;
+  this.setStrokeWidth(this.zoom_memory["stroke-width"]);
+  
+  if (this.type == "text")
+    this.attr({
+      "font-size":  this.zoom_memory["font-size"] * zoom,
+      "x":          this.zoom_memory["x"] * zoom,
+      "y":          this.zoom_memory["y"] * zoom
+    });
+  
   return this;
 }
 
@@ -78,7 +100,8 @@ Raphael.el.setAttr = function() {
   } else {
     attr = arguments[0];
   }
-  Object.keys(attr).each((function(key) {
+  
+  for (var key in attr) {
     switch(key) {
       case "stroke-width":
         this.setStrokeWidth(attr[key]);
@@ -88,14 +111,16 @@ Raphael.el.setAttr = function() {
       break;
       case "x":
       case "y":
-        if (this.type == "text") this.zoom[key] = attr[key] / this.zoom.value;
+        if (this.type == "text")
+          this.zoom_memory[key] = attr[key] / this.zoom;
         this.attr(key, attr[key]);
       break;
       default:
         this.attr(key, attr[key]);
       break;
     }
-  }).bind(this));
+  }
+  return this;
 }
 
 // set element translation
@@ -107,25 +132,40 @@ Raphael.el.setTranslation = function(x, y) {
     });
   else
     this.translate(x,y);
+  
+  return this;
+}
+
+// set element rotation
+Raphael.el.setRotation = function(angle, x, y) {
+  if (!this.zoom_memory) this.initZoom();
+  if (angle == 0)
+    angle = 360;
+  this.rotate(angle, x, y);
+  this.zoom_memory.rotation = angle;
+  this.transformations = [];
+  this._.rt = { cx: null, cy: undefined, deg: 360 };
+  
+  return this;
 }
 
 // set element zoomed stroke width
-Raphael.el.setStrokeWidth = function(sw) {
-  if (sw.isFloat()) {
-    sw = parseFloat(sw);
-    this.attr({ "stroke-width": sw * this.zoom.value });
-    this.zoom["stroke-width"] = sw;
+Raphael.el.setStrokeWidth = function(value) {
+  if (value == 0 || (value = parseFloat(value))) {
+    this.attr({ "stroke-width": value * this.zoom });
+    this.zoom_memory["stroke-width"] = value;
   }
+  
   return this;
 }
 
 // set element font size
-Raphael.el.setFontSize = function(fs) {
-  if (fs.isFloat()) {
-    fs = parseFloat(fs);
-    this.attr({ "font-size": fs });
-    this.zoom["font-size"] = fs / this.zoom.value;
+Raphael.el.setFontSize = function(value) {
+  if (value == 0 || (value = parseFloat(value))) {
+    this.attr({ "font-size": value * this.zoom });
+    this.zoom_memory["font-size"] = value;
   }
+  
   return this;
 }
 
@@ -134,35 +174,8 @@ Raphael.el.applyScale = function() {
   this._.sx = 1;
   this._.sy = 1;
   this.scale(1, 1);
+  
+  return this;
 }
-
-// Number class methods
-Object.extend(Number.prototype, {
-  isInt: function() {
-    if (this == 0) return true;
-    return parseInt(this) ? true : false;
-  },
-  isFloat: function() {
-    if (this == 0.0) return true;
-    return parseFloat(this) ? true : false;
-  }
-});
-
-// String class methods
-Object.extend(String.prototype, {
-  isInt: function() {
-    if (this == "0") return true;
-    return parseInt(this) ? true : false;
-  },
-  isFloat: function() {
-    if (["0", "0.0"].indexOf(this) > -1) return true;
-    return parseFloat(this) ? true : false;
-  }
-});
-
-
-
-
-
 
 

@@ -1,4 +1,4 @@
-# Raphaël Zoom plugin - 0.0.3
+# Raphaël Zoom plugin - 0.0.4
 
 ### What is it?
 An extension to the Raphael Vector Library.<br/>
@@ -11,12 +11,12 @@ This means that you can set the zoom back to 1 (100%) at any time.
 
 Basic usage:
 
-    // Creates canvas 800 × 500 at 10, 10
-    var paper = Raphael(10, 10, 800, 500);
+    // Creates canvas 800 × 500 at 10, 10 and initialize it's zoom
+    var paper = Raphael(10, 10, 800, 500).initZoom();
     
-    // Add a circle
-    var circle = this.paper.circle(150, 120, 100);
-    circle.attr({
+    // Add a circle and initialize it's zoom
+    var circle = this.paper.circle(150, 120, 100).initZoom();
+    circle.setAttr({
       fill:           "#83B100",
       stroke:         "#333",
       "stroke-width": 10
@@ -43,20 +43,9 @@ Like
     // Translate element
     circle.setTranslation(20, 30);
 
-As an extra this plugin will provide you with a paper.elements() function.
-This will return an array with all elements in the paper:
-
-    // Get all elements
-    var shapes = paper.elements();
 
 ### Dependencies
 - [Raphael JS](http://raphaeljs.com/)
-- [Prototype JS](http://prototypejs.org/)
-
-### Important
-- This plugin is still under development
-- It requires the Prototype JS library
 
 ### To-do
-- writing tests
-- testing with sets
+- animated zoom
